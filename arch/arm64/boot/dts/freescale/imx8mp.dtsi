@@ -1226,7 +1226,10 @@
 				nvmem-cell-names = "mac-address";
 				fsl,stop-mode = <&gpr 0x10 3>;
 				nvmem_macaddr_swap;
-				status = "disabled";
+				fsl,switch-mcore-ctrl;
+				mbox-names = "rxdb", "txdb";
+				mboxes = <&mu 3 0 &mu 2 0>;
+				status = "okay";
 			};
 
 			eqos: ethernet@30bf0000 {

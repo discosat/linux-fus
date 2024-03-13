@@ -9,26 +9,26 @@
 /dts-v1/;
 
 /* Set board revision as 3-digit number, e.g. 110 for board rev. 1.10 */
-#define CONFIG_PICOCOREMX8MP_BOARD_REVISION	100
+#define CONFIG_PICOCOREMX8MP_BOARD_REVISION	110
 /* Set baseboard revision as 3-digit number, e.g. 110 for board rev. 1.10 */
 #define CONFIG_PICOCOREBBDSI_BOARD_REVISION	140
-//#define SUPPORT_M7
+#define SUPPORT_M7
 //#define SUPPORT_RPMSG
 
 /* HDMI */
 //#define CONFIG_PICOCOREMX8MP_HDMI
 
 /* Network */
-#define CONFIG_PICOCOREMX8MP_ETH_A
-#define CONFIG_PICOCOREMX8MP_ETH_B
+// #define CONFIG_PICOCOREMX8MP_ETH_A
+// #define CONFIG_PICOCOREMX8MP_ETH_B
 
 /* WLAN/BLUETOOTH; either WLAN-only or combined WLAN/Bluetooth chip */
-#define CONFIG_PICOCOREMX8MP_WLAN
-#define CONFIG_PICOCOREMX8MP_WLAN_MARVELL_DRV
+// #define CONFIG_PICOCOREMX8MP_WLAN
+// #define CONFIG_PICOCOREMX8MP_WLAN_MARVELL_DRV
 
 /* USB */
 #define CONFIG_PICOCOREMX8MP_USB_OTG
-//#define CONFIG_PICOCOREMX8MP_USB_OTG_PWR
+#define CONFIG_PICOCOREMX8MP_USB_OTG_PWR
 #define CONFIG_PICOCOREMX8MP_USB_HOST
 
 /* EEPROM - default not mounted */
@@ -38,21 +38,21 @@
 #define CONFIG_PICOCOREMX8MP_PCIE
 
 /* CAN - default not mounted */
-#define CONFIG_PICOCOREMX8MP_CAN_A
+// #define CONFIG_PICOCOREMX8MP_CAN_A
 #define CONFIG_PICOCOREMX8MP_CAN_B
 
 /* I2C */
 /* default CAN_B */
-#define CONFIG_PICOCOREMX8MP_I2C_A
-#define CONFIG_PICOCOREMX8MP_I2C_B
-#define CONFIG_PICOCOREMX8MP_I2C_C
+// #define CONFIG_PICOCOREMX8MP_I2C_A
+// #define CONFIG_PICOCOREMX8MP_I2C_B
+// #define CONFIG_PICOCOREMX8MP_I2C_C
 #define CONFIG_PICOCOREMX8MP_I2C_D
 #define CONFIG_PICOCOREMX8MP_I2C_E
 //#define CONFIG_PICOCOREMX8MP_I2C_D_A71CH
 
 /* PWM and backlight brightness */
-#define CONFIG_PICOCOREMX8MP_PWM_A
-#define CONFIG_PICOCOREMX8MP_BL_CTRL
+// #define CONFIG_PICOCOREMX8MP_PWM_A
+// #define CONFIG_PICOCOREMX8MP_BL_CTRL
 
 /* UART_A - UART2 */
 #define CONFIG_PICOCOREMX8MP_UART_A
@@ -74,10 +74,10 @@
 #define CONFIG_PICOCOREMX8MP_SPI_C
 
 /* Audio */
-#define CONFIG_PICOCOREMX8MP_I2S_A
-#define CONFIG_PICOCOREMX8MP_I2S_B
+// #define CONFIG_PICOCOREMX8MP_I2S_A
+// #define CONFIG_PICOCOREMX8MP_I2S_B
 /* SGTL5000 needs I2S_A */
-#define CONFIG_PICOCOREMX8MP_SGTL5000_AUDIO
+// #define CONFIG_PICOCOREMX8MP_SGTL5000_AUDIO
 
 
 /* External RTC - default not mounted */
@@ -144,6 +144,7 @@
  * Exclude devices from Linux that are used by the Cortex-M7 FreeRTOS examples
  *
  * - UART_C: Debug Console for Cortex-M7
+ * - UART_D: GNSS COMM for Cortex-M7
  * - PWM_A: PWM Signal for the PWM example
  * - CAN_A: CAN-Signal for FlexCAN examples
  * - I2C_A:  I2C Bus used in I2C examples
@@ -153,6 +154,7 @@
 
 #ifdef SUPPORT_M7
 #undef CONFIG_PICOCOREMX8MP_UART_C
+#undef CONFIG_PICOCOREMX8MP_UART_D
 #undef CONFIG_PICOCOREMX8MP_PWM_A
 #undef CONFIG_PICOCOREMX8MP_CAN_A
 #undef CONFIG_PICOCOREMX8MP_I2C_A
