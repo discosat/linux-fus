@@ -149,6 +149,40 @@ static u32 imx_mu_read(struct imx_mu_priv *priv, u32 offs)
 	return ioread32(priv->base + offs);
 }
 
+/*!
+ * @brief Clear one or more GIP flags from a SR register
+ *
+ * These flags on read indicate whether there is a pending interrupt.  Writing
+ * a 1 to a flag clears the interrupt.
+ *
+ * @param priv   IMX MU device private info
+ * @param val    The flags to clear.  Only bits 28..31 are used, corresponding
+ *               to GP interrupts 0..3.  Other bits are ignored.
+ */
+static void imx_mu_clear_gip(struct imx_mu_priv *priv, u32 val)
+{
+	imx_mu_write(priv, (val & 0xf0000000), priv->dcfg->xSR[IMX_MU_GSR]);
+}
+
+/*!
+ * @brief Set one or more GIE flags in a CR register
+ *
+ * These flags enable GP interrupts 0..3.
+ *
+ * @param priv   IMX MU device private info
+ * @param flags  Values 0..15 representing 4 bit fields for GP interrupts
+ *               0..3.  This value will be shifted to bits 38..31 for writing
+ *               to the CR register.
+ */
+static void imx_mu_set_gie(struct imx_mu_priv *priv, u32 flags)
+{
+	u32 val;
+
+	val = imx_mu_read(priv, priv->dcfg->xCR[IMX_MU_GIER]);
+	val |= ((flags << 28) & 0xf0000000);
+	imx_mu_write(priv, val, priv->dcfg->xCR[IMX_MU_GIER]);
+}
+
 static int imx_mu_tx_waiting_write(struct imx_mu_priv *priv, u32 val, u32 idx)
 {
 	u64 timeout_time = get_jiffies_64() + IMX_MU_SECO_TX_TOUT;
@@ -514,7 +548,22 @@ static irqreturn_t imx_mu_isr(int irq, void *p)
 	}
 
 	if (!val)
-		return IRQ_NONE;
+	{
+		val = imx_mu_read(priv, priv->dcfg->xSR[IMX_MU_GSR]);
+		if (val & 0xf0000000)
+		{
+			// There's a GIR interrupt that hasn't been handled.  Clear it.
+			dev_warn_ratelimited(priv->dev,
+					     "GIR Interrupt value is 0 (ASR is 0x%x)\n",
+					     val);
+			imx_mu_clear_gip(priv, val);
+			return IRQ_HANDLED;
+		}
+		else
+		{
+			return IRQ_NONE;
+		}
+	}
 
 	if ((val == IMX_MU_xSR_TEn(priv->dcfg->type, cp->idx)) &&
 	    (cp->type == IMX_MU_TYPE_TX)) {
@@ -838,6 +887,10 @@ static int imx_mu_probe(struct platform_device *pdev)
 		clk_disable_unprepare(priv->clk);
 		return ret;
 	}
+
+	// Enable GP interrupt 0 (mask 0x8) so the M7 can wake us up with it
+	//
+	imx_mu_set_gie(priv, 0x8);
 
 	pm_runtime_enable(dev);
 
